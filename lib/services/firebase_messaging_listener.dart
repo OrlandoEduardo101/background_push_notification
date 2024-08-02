@@ -1,17 +1,19 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+
 import 'firebase_background_message_handler.dart';
 import 'init_firebase.dart';
 
 class FirebaseMessagingListener {
   Future<void> listenToken() async {
-    await InitFirebase().updateFirebaseToken();
-    FirebaseMessaging.instance.onTokenRefresh.listen((_) {
-      InitFirebase().updateFirebaseToken();
+    notificationToken = await InitFirebase().getFirebaseToken;
+    InitFirebase().updateFirebaseToken(notificationToken);
+    FirebaseMessaging.instance.onTokenRefresh.listen((value) {
+      InitFirebase().updateFirebaseToken(value);
     });
   }
 
   Future<void> registerNotification() async {
-    NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
+    await FirebaseMessaging.instance.requestPermission(
       alert: true,
       announcement: false,
       badge: true,

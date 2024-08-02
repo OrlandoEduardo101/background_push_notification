@@ -19,6 +19,7 @@ class FirebaseBackgroundMessageHandler {
 
   @pragma('vm:entry-point')
   static void triggerNotification(RemoteMessage message) async {
+    // logic to run when receive notification
     final ILocalPushNotificationService localPushNotificationService = LocalPushNotificationService.getInstance();
 
     final data = message.data;

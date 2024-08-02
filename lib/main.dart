@@ -1,18 +1,31 @@
+import 'package:background_push_notification/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'services/firebase_messaging_listener.dart';
+import 'services/local_push_notification_service.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 final firebaseMessagingListener = FirebaseMessagingListener();
 
 Future<void> main() async {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp();
+  //Init firebase and FCM
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   firebaseMessagingListener.setOnbackgroundMessage();
   await firebaseMessagingListener.registerNotification();
+
+  //init local pushes
+
+  final ILocalPushNotificationService localPushNotificationService =
+      LocalPushNotificationService(flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin);
+
+  localPushNotificationService.initialize();
+  localPushNotificationService.requestPermissions();
+
   runApp(const MyApp());
 }
 
@@ -68,6 +81,12 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    firebaseMessagingListener.listenToken();
+  }
 
   void _incrementCounter() {
     setState(() {

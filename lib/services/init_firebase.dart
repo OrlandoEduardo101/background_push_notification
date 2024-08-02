@@ -1,8 +1,6 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../main.dart';
@@ -50,49 +48,10 @@ class InitFirebase {
         ?.createNotificationChannel(channel);
   }
 
-  Future<void> initFirebase(BuildContext context) async {
-    WidgetsFlutterBinding.ensureInitialized();
-
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    NotificationSettings settings = await messaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      log('FirebaseMessaging.onMessage: ${message.notification?.title}');
-
-      final data = message.data;
-
-      final payload = {
-        'id': int.tryParse(data['eventId'] ?? '-1') ?? -1,
-        'positionId': int.tryParse(data['positionId'] ?? '-1') ?? -1,
-        'attributes': data['attributes'],
-        'type': data['type'],
-        'deviceName': message.notification?.title,
-      };
-
-      await localPushNotificationService.localPushNotification(
-          message.notification?.title ?? '', message.notification?.body ?? '', json.encode(payload), 0);
-    });
-
-    createAndroidChannel(false);
-
-    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-  }
-
-  Future<void> updateFirebaseToken() async {
+  Future<void> updateFirebaseToken(String token) async {
+    notificationToken = token;
     log('notificationToken: $notificationToken');
   }
+
+  Future<String> get getFirebaseToken async => (await messaging.getToken()) ?? "";
 }
