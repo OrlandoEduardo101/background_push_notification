@@ -107,11 +107,6 @@ class LocalPushNotificationService implements ILocalPushNotificationService {
     vibrationPattern[2] = 5000;
     vibrationPattern[3] = 2000;
 
-    var isAlarm = body.toLowerCase().contains('alarm') ||
-        title.toLowerCase().contains('alarm') ||
-        body.toLowerCase().contains('sos') ||
-        title.toLowerCase().contains('sos');
-
     AndroidNotificationDetails androidNotificationDetails = AndroidNotificationDetails(
       'channel', 'channel Notification',
       channelDescription: 'Notifications tracking',
